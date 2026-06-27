@@ -21,10 +21,12 @@
 ;; to the rom-buildup reference (sedan ≈ 0.248); retune against tunnel/large-
 ;; domain CFD. The RANKING from the LBM is exact; only the scale is calibrated.
 (def ^:const calibration-2d 0.081)   ; sectional block ≈ 3.06 → 0.248
-;; 3D BGK is laminar (Cd cannot reach the turbulent automotive value); this
-;; anchors the fastback3d raw (≈2.89 @Re150, 16% blockage) to the rom-buildup
-;; sedan reference. Retiring this needs MRT/LES + GPU, not just resolution.
-(def ^:const calibration-3d 0.086)   ; vehicle fastback3d ≈ 2.89 → 0.248
+;; 3D now runs with a Smagorinsky LES, so the drag is taken in the turbulent
+;; HIGH-Re PLATEAU (Re-independent, the validatable regime) instead of a single
+;; laminar point. The residual scale gap (~2.0 vs ~0.3) is the coarse grid +
+;; 16% blockage, not the Re physics; a low-blockage fine grid (GPU) would shrink
+;; it further. Anchors fastback3d @Re3000 (≈2.01) to the rom-buildup sedan ref.
+(def ^:const calibration-3d 0.123)   ; vehicle fastback3d ≈ 2.01 → 0.247
 
 (defn- resolve-bin []
   (or (System/getenv "KAMI_CFD_BIN")
@@ -52,7 +54,7 @@
                                   {:tried "KAMI_CFD_BIN / sibling kami-cfd build"})))
         dim   (get-in case [:solver :dim] 2)
         shape (shape-of case dim)
-        re    (get-in case [:solver :re] (if (= dim 3) 150 100))
+        re    (get-in case [:solver :re] (if (= dim 3) 3000 100))   ; 3D: LES high-Re plateau
         steps (get-in case [:solver :steps] (if (= dim 3) 1500 3000))
         {:keys [exit out err]} (sh/sh bin shape (str re) (str steps))
         _     (when-not (zero? exit)
