@@ -1,12 +1,12 @@
 {:paths ["src"]
  ;; Reduced-order aero solver over the shared, purpose-split libraries:
- ;;   datom-clj      — kotoba Datom-log representation
- ;;   vphysics-clj   — road-load / aero force / range math
- ;;   cae-solver-clj — the solve dispatch contract (:rom-buildup ↔ :lbm)
+ ;;   datom      — kotoba Datom-log representation
+ ;;   vphysics   — road-load / aero force / range math
+ ;;   cae-solver — the solve dispatch contract (:rom-buildup ↔ :lbm)
  ;; A future kami-cfd (Rust LBM) registers :lbm on the same contract.
- :deps {io.github.com-junkawasaki/datom-clj      {:local/root "../datom-clj"}
-        io.github.com-junkawasaki/vphysics-clj   {:local/root "../vphysics-clj"}
-        io.github.com-junkawasaki/cae-solver-clj {:local/root "../cae-solver-clj"}}
+ :deps {io.github.kotoba-lang/datom      {:local/root "../datom"}
+        io.github.kotoba-lang/vphysics   {:local/root "../vphysics"}
+        io.github.kotoba-lang/cae-solver {:local/root "../cae-solver"}}
  :aliases
  {:run  {:main-opts ["-m" "aero.cli"]}
   :test {:extra-paths ["test"]
